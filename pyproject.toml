@@ -1,0 +1,10 @@
+[project]
+name = "bundestaikes"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "assemblyai>=0.40.2",
+    "dotenv>=0.9.9",
+    "mutagen>=1.47.0",
+    "openai>=1.76.0",
+]
