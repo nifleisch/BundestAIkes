@@ -4,7 +4,7 @@ import re
 from mutagen.mp3 import MP3
 import openai
 import assemblyai as aai
-
+from fuzzywuzzy import fuzz
 
 def normalize_text(text: str) -> str:
     """
@@ -142,26 +142,21 @@ def get_word_level_timestamps(mp4_path: str, assemblyai_key: str, sentence: str)
     normalized_words = [normalize_text(w.text) for w in words]
     
     # Try to find the sentence using a sliding window
-    best_match = None
-    best_match_score = 0
+   
     window_size = len(target_words)
-    
+    best_score = -1
+    best_window = ""
     for i in range(len(words) - window_size + 1):
-        # Get the current window of words
-        current_words = normalized_words[i:i + window_size]
-        current_text = ' '.join(current_words)
-        
-        # Calculate match score (number of matching words)
-        matching_words = sum(1 for w1, w2 in zip(target_words, current_words) if w1 == w2)
-        match_score = matching_words / len(target_words)
-        
-        # If we find a better match, update best_match
-        if match_score > best_match_score:
-            best_match_score = match_score
+        window = " ".join(normalized_words[i:i+window_size])
+        score = fuzz.token_set_ratio(target_words, window)
+        if score > best_score:
+            best_score = score
+            best_window = window
             best_match = (i, i + window_size - 1)
+           
     
     # If we found a good enough match (at least 70% of words match)
-    if best_match and best_match_score >= 0.7:
+    if len(best_window)>1 and best_score>=70:
         start_idx, end_idx = best_match
         start_time = words[start_idx].start / 1000.0  # Convert ms to seconds
         end_time = words[end_idx].end / 1000.0  # Convert ms to seconds
