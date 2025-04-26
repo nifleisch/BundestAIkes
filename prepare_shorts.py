@@ -132,12 +132,12 @@ def main(input_path: str):
     transcript_path = "intermediate/transcript/full_transcript_verbose.json"
     raw_transcript = get_transcript_text(transcript_path)
     
-    extract_topics(raw_transcript)
-    extract_speeches(raw_transcript)
+    #extract_topics(raw_transcript)
+    #extract_speeches(raw_transcript)
 
-    extract_statements()
-    score_statements()
-    create_topic_collections()
+    #extract_statements()
+    #score_statements()
+    #create_topic_collections()
     create_shorts_from_collections(input_path, transcript_path)
 
 
