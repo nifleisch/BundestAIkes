@@ -1,5 +1,5 @@
 moviepy>=1.0.3
-openai-whisper>=20231117
+openai-whisper
 numpy>=1.25.0
 requests
 pillow
