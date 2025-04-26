@@ -127,10 +127,10 @@ def create_shorts_from_collections(input_video_path: str, transcript_path: str):
 
 
 def main(input_path: str):
-    mp3_path = convert_to_mp3(input_path)
-    transcript_path = transcribe_audio(mp3_path, os.getenv("OPENAI_API_KEY"))
+    #mp3_path = convert_to_mp3(input_path)
+    #transcript_path = transcribe_audio(mp3_path, os.getenv("OPENAI_API_KEY"))
     transcript_path = "intermediate/transcript/full_transcript_verbose.json"
-    raw_transcript = get_transcript_text(transcript_path)
+    #raw_transcript = get_transcript_text(transcript_path)
     
     #extract_topics(raw_transcript)
     #extract_speeches(raw_transcript)

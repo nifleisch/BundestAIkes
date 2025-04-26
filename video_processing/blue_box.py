@@ -1,6 +1,7 @@
 from openai import OpenAI
 import openai
 import json
+# from prepare_shorts import create_shorts_from_collections
 import requests
 from moviepy import *
 
@@ -55,7 +56,7 @@ def script_generator(client, system_text, clips, summary):
         
         data = json.loads(assistant_reply)
         output_list.append(data)
-        with open(f'./data/output/output_{idx}.json', 'w') as json_file:
+        with open(f'./intermediate/tiktokscript/output_{idx}.json', 'w') as json_file:
             json.dump(data, json_file, indent=4)
         print(f"Succesful reply {idx}")
     return output_list
@@ -129,55 +130,93 @@ def text_to_speech(text, voice="nova", model="tts-1"):
 
     return response.content
 
+def create_video_Topic(client,topic_path,topic_name):
 
-if __name__ == "__main__":
-    client = OpenAI()
-
-    # Read system prompt
-    with open('./data/system/prompt.txt', 'r') as f:
+    with open('./text_mining/tiktok_script_generation_prompt.txt', 'r') as f:
         system_text = f.read()
 
-    # Read clips
-    with open('./data/user/clips.json', 'r') as f:
+    with open(topic_path+topic_name+"/"+topic_name+".jsonl", 'r') as f:
         clips = json.load(f)
+    summary=f"{clips['topic']}: {clips['explanation']}"
+    output_lists = script_generator(client, system_text, clips["statements"], summary)
 
-    # Read markdown
-    with open('./data/user/summary.md', 'r') as f:
-        summary = f.read()
+
+    # #TODO: HERE ADD PAUL'S FUNCTION
+    # #for idx, vids2gen in enumerate(output_lists[1]):
+    # #    image_generator(client, vids2gen["description"], idx) # Replace with Paul
+    # create_shorts_from_collections(topic_path,
+    #                                topic_path+topic_name)
+    # # create_shorts_from_collections(input_path, transcript_path)
     
-    output_lists = script_generator(client, system_text, clips, summary)
-
-    #TODO: HERE ADD PAUL'S FUNCTION
-    #for idx, vids2gen in enumerate(output_lists[1]):
-    #    image_generator(client, vids2gen["description"], idx) # Replace with Paul
+    # extracted_frame= extracted_frame(topic_path, topic_path+topic_name)
+    # # extracted_frame = extract_frame(args.video_path, args.json_path)
     
-    #TODO: REPLACE WITH NILS VIDEOS
-    re_vids = vid2croppedclip(output_lists[0], clips, "./data/input/video.mp4")
+    # # captioned_video_path = create_captions(topic_path, "./intermediate/captioned")
+
+    # # captioned_video_path = create_captions(input_video, output_directory)
+
+    # re_vids = vid2croppedclip(output_lists[0], clips, "./data/input/video.mp4")
+
+    # re_vids = vid2croppedclip(output_lists[0], clips, "./data/input/video.mp4")
+
+
+def create_all_videos(client,path: str, topics):
+    print("Generating videos... ")
+    for t in topics:
+        print("Generating Topic video ",t)
+        create_video_Topic(client,path,t)
+    print("Thanks, now enjoy...")
+
+
+
+if __name__ == "__main__":
+
+    # Read system prompt
+    # with open('./data/system/prompt.txt', 'r') as f:
+    #     system_text = f.read()
+
+    # # Read clips
+    # with open('./data/user/clips.json', 'r') as f:
+    #     clips = json.load(f)
+
+    # # Read markdown
+    # with open('./data/user/summary.md', 'r') as f:
+    #     summary = f.read()
+    
+    # output_lists = script_generator(client, system_text, clips, summary)
+
+    # #TODO: HERE ADD PAUL'S FUNCTION
+    # #for idx, vids2gen in enumerate(output_lists[1]):
+    # #    image_generator(client, vids2gen["description"], idx) # Replace with Paul
+    
+    # #TODO: REPLACE WITH NILS VIDEOS
+    # re_vids = vid2croppedclip(output_lists[0], clips, "./data/input/video.mp4")
     
 
-    ai_vids = []
-    vids = []
-    c_ai = 0
-    c_re = 0
+    # ai_vids = []
+    # vids = []
+    # c_ai = 0
+    # c_re = 0
 
-    for idx, dct in enumerate(output_lists[1]):
-        counter = 0
-        for texts in output_lists[0]:
-            if texts["index"] ==-1:
-                if idx == counter:
-                    break
-                counter+=1
-        print(texts["narrator"])
-        ai_vid = img2vid(f"./data/output/{idx}.png", dct["duration"], texts["narrator"])
-        ai_vids.append(ai_vid)
+    # for idx, dct in enumerate(output_lists[1]):
+    #     counter = 0
+    #     for texts in output_lists[0]:
+    #         if texts["index"] ==-1:
+    #             if idx == counter:
+    #                 break
+    #             counter+=1
+    #     print(texts["narrator"])
+    #     ai_vid = img2vid(f"./data/output/{idx}.png", dct["duration"], texts["narrator"])
+    #     ai_vids.append(ai_vid)
 
-    for dct in output_lists[0]:
-        if dct["index"] != -1:
-            vid = re_vids[c_re]
-            c_re+=1
-        else:
-            vid = ai_vids[c_ai]
-            c_ai+=1
-        vids.append(vid)
+    # for dct in output_lists[0]:
+    #     if dct["index"] != -1:
+    #         vid = re_vids[c_re]
+    #         c_re+=1
+    #     else:
+    #         vid = ai_vids[c_ai]
+    #         c_ai+=1
+    #     vids.append(vid)
     
-    concatenate_videos(vids,"./data/output/tiktok.mp4")
+    # concatenate_videos(vids,"./data/output/tiktok.mp4")
+    create_video_Topic(client,"./intermediate/shorts_draft/","generationengerechtigkeit")
