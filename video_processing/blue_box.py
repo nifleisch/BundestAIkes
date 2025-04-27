@@ -300,7 +300,7 @@ def create_video_Topic(client,topic_path,topic_name):
     print("--- Caption Generation Successful ---")
     print(f"Output video saved to: {captioned_video_path}")
 
-    extract_frame(captioned_video_path, topic_path+topic_name+"/"+topic_name+".jsonl",client)
+    extract_frame(topic_name,captioned_video_path, topic_path+topic_name+"/"+topic_name+".jsonl",client)
     # extracted_frame = extract_frame(captioned_video_path, topic_path+topic_name+"/"+topic_name+".jsonl",client)
     # output_filename = os.path.join("./output/tiktok/", f"{topic_name}_frame.jpg")
 

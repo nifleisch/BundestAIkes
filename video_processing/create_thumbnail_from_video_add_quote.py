@@ -113,7 +113,7 @@ def calculate_ear(eye_landmarks, frame_shape):
         return 0.0
 
 
-def extract_frame(video_path, json_path,client):
+def extract_frame(t_name,video_path, json_path,client):
     """
     Loads a video, finds the first frame with open eyes, reads spoken text from
     a potentially nested JSON file by finding all 'quote' keys, generates a catchy
@@ -281,7 +281,9 @@ def extract_frame(video_path, json_path,client):
         image_bytes = base64.b64decode(image_base64)
 
         # Save the image to a file
-        with open("./output/tiktok/thumbnail.png", "wb") as f:
+        fn ="./output/tiktok/thumbnail_" +t_name+".png"
+        print(fn)
+        with open(fn, "wb") as f:
             f.write(image_bytes)
         '''
         draw = ImageDraw.Draw(pil_image)
