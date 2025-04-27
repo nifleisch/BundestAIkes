@@ -136,7 +136,13 @@ def vid2croppedclip(clips, path) -> list[VideoFileClip]:
             clips_out.append(clip_final_sub)
     return clips_out
 
+from  moviepy.video.fx import FadeOut
+
 def concatenate_videos(clip_list, nameout, lenny_indices):
+
+    effect= FadeOut(2)
+    for index in lenny_indices:
+        clip_list[index] = effect.copy().apply(clip_list[index]) 
     clipfinal = concatenate_videoclips(clip_list)
     if ".mp4" in nameout:
         clipfinal.write_videofile(nameout,
@@ -303,4 +309,4 @@ if __name__ == "__main__":
     #     vids.append(vid)
     
     # concatenate_videos(vids,"./data/output/tiktok.mp4")
-    create_video_Topic(client,"./intermediate/shorts_draft/","generationengerechtigkeit")
+    create_video_Topic(client,"./intermediate/shorts_draft/","antisemetismus")
