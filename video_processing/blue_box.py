@@ -7,9 +7,9 @@ from moviepy import *
 import dotenv
 import base64
 import os
-from create_captions import create_captions
+from video_processing.create_captions import create_captions
 import cv2
-from create_thumbnail_from_video_add_quote import extract_frame
+from video_processing.create_thumbnail_from_video_add_quote import extract_frame
 
 if not os.path.exists("./intermediate/image_gen"):
     os.makedirs("./intermediate/image_gen",exist_ok=True)
@@ -54,10 +54,6 @@ def crop_video(clip):
         target_height = 360
         crop_width = target_width# min(target_width, clip.w)   
         crop_height = target_height #min(target_height, clip.h)
-    # Resize proportionally (preserve aspect ratio)
-    # clip = clip.resized(height=target_height)
-    # if clip.w > target_width:
-    #     clip = clip.resized(width=target_width)
 
     clip = cc.resized((target_width, target_height))
     return clip
@@ -132,9 +128,7 @@ def vid2croppedclip(clips, path, smallest_dims) -> list[VideoFileClip]:
             except:
                 filename = f"statement_{c['index']}_rough.mp4"
                 filepath = path +'/'+filename
-                clip = VideoFileClip(filepath)            
-            # start = clips_times[c["index"]]["start"]
-            # end = clips_times[c["index"]]["end"]            
+                clip = VideoFileClip(filepath)              
             clip_final_sub, smallest_dims = crop_video(clip, smallest_dims)
             # clip_final_sub = clip_final_sub.subclipped(start, end) 
             clips_out.append(clip_final_sub)
@@ -241,15 +235,7 @@ def create_video_Topic(client,topic_path,topic_name):
     print(f"Output video saved to: {captioned_video_path}")
 
     extract_frame(topic_name,captioned_video_path, topic_path+topic_name+"/"+topic_name+".jsonl",client)
-    # extracted_frame = extract_frame(captioned_video_path, topic_path+topic_name+"/"+topic_name+".jsonl",client)
-    # output_filename = os.path.join("./output/tiktok/", f"{topic_name}_frame.jpg")
 
-    # try:
-    #     cv2.imwrite(output_filename, extracted_frame)
-    #     print(f"Frame successfully saved as {output_filename}")
-    # except Exception as e:
-    #     print(f"Error saving frame: {e}")
-    #     print("Failed to save frame.")
 
 
 def create_all_videos(client,path: str, topics):
