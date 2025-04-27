@@ -8,7 +8,8 @@ import datetime
 import json
 import openai
 from PIL import Image, ImageDraw, ImageFont
-
+import base64
+from io import BytesIO
 # --- Font Settings (User might need to adjust FONT_PATH) ---
 # Ensure the font file supports German characters (e.g., Arial, Verdana, DejaVuSans)
 # Common paths:
@@ -112,7 +113,7 @@ def calculate_ear(eye_landmarks, frame_shape):
         return 0.0
 
 
-def extract_frame(video_path, json_path):
+def extract_frame(video_path, json_path,client):
     """
     Loads a video, finds the first frame with open eyes, reads spoken text from
     a potentially nested JSON file by finding all 'quote' keys, generates a catchy
@@ -264,6 +265,25 @@ def extract_frame(video_path, json_path):
     try:
         # Convert OpenCV BGR image to Pillow RGB image
         pil_image = Image.fromarray(cv2.cvtColor(selected_frame, cv2.COLOR_BGR2RGB))
+        pil_buffer = BytesIO()
+        pil_image.save(pil_buffer, format="PNG")  # Save in memory as PNG
+        pil_buffer.seek(0)  # Important! Move to the start of the BytesIO buffer
+        pil_buffer.name = "image.png"
+        prompt = f"Out of the following text, return up to five words that describe the content, are catchy and can be used to be placed on top of the image we provide you in order to generate a thumbnail for a youtube shorts about a discussion in the german parliament.: {spoken_text}." # New German prompt (max 8 words)
+        result = client.images.edit(
+            model="gpt-image-1",
+            image=[
+                pil_buffer
+            ],
+            prompt=prompt
+        )
+        image_base64 = result.data[0].b64_json
+        image_bytes = base64.b64decode(image_base64)
+
+        # Save the image to a file
+        with open("./output/tiktok/thumbnail.png", "wb") as f:
+            f.write(image_bytes)
+        '''
         draw = ImageDraw.Draw(pil_image)
 
         # Load the TrueType font
@@ -346,7 +366,7 @@ def extract_frame(video_path, json_path):
             selected_frame = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
         else:
             print("Skipping text drawing due to font loading issues.")
-
+        '''
     except ImportError:
         print("Error: Pillow library not installed. Cannot draw text with UTF-8 support.")
         print("Please install Pillow: pip install Pillow")
@@ -356,8 +376,8 @@ def extract_frame(video_path, json_path):
         print(f"Error during text drawing with Pillow: {e}")
         # Decide how to handle this - skip text? return None?
 
-    print(f"Successfully extracted frame {frame_count} with open eyes and added quote.")
-    return selected_frame
+    # print(f"Successfully extracted frame {frame_count} with open eyes and added quote.")
+    # return selected_frame
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract a frame from a video.')

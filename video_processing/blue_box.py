@@ -8,7 +8,8 @@ import dotenv
 import base64
 import os
 from create_captions import create_captions
-
+import cv2
+from create_thumbnail_from_video_add_quote import extract_frame
 
 if not os.path.exists("./intermediate/image_gen"):
     os.makedirs("./intermediate/image_gen",exist_ok=True)
@@ -293,26 +294,22 @@ def create_video_Topic(client,topic_path,topic_name):
             lenny_indices.append(idx)
         vids.append(vid)
 
-    # ##pual's:
 
     concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4", lenny_indices,smallest_dims)
     captioned_video_path = create_captions("./intermediate/tiktok/tiktok_inter.mp4", "./output/tiktok/")
     print("--- Caption Generation Successful ---")
     print(f"Output video saved to: {captioned_video_path}")
-    # # create_shorts_from_collections(input_path, transcript_path)
-    
-    # extracted_frame= extracted_frame(topic_path, topic_path+topic_name)
-    # # extracted_frame = extract_frame(args.video_path, args.json_path)
-    
-    # # captioned_video_path = create_captions(topic_path, "./intermediate/captioned")
 
-    # # captioned_video_path = create_captions(input_video, output_directory)
+    extract_frame(captioned_video_path, topic_path+topic_name+"/"+topic_name+".jsonl",client)
+    # extracted_frame = extract_frame(captioned_video_path, topic_path+topic_name+"/"+topic_name+".jsonl",client)
+    # output_filename = os.path.join("./output/tiktok/", f"{topic_name}_frame.jpg")
 
-
-    # re_vids = vid2croppedclip(output_lists[0], clips, "./data/input/video.mp4")
-
-
-
+    # try:
+    #     cv2.imwrite(output_filename, extracted_frame)
+    #     print(f"Frame successfully saved as {output_filename}")
+    # except Exception as e:
+    #     print(f"Error saving frame: {e}")
+    #     print("Failed to save frame.")
 
 
 def create_all_videos(client,path: str, topics):
@@ -329,4 +326,4 @@ if __name__ == "__main__":
 
     client = OpenAI()
     
-    create_video_Topic(client,"./intermediate/shorts_draft/","antisemitismus")
+    create_video_Topic(client,"./intermediate/shorts_draft/","generationengerechtigkeit")
