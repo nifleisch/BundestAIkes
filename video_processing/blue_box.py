@@ -136,7 +136,7 @@ def vid2croppedclip(clips, path) -> list[VideoFileClip]:
             clips_out.append(clip_final_sub)
     return clips_out
 
-def concatenate_videos(clip_list, nameout):
+def concatenate_videos(clip_list, nameout, lenny_indices):
     clipfinal = concatenate_videoclips(clip_list)
     if ".mp4" in nameout:
         clipfinal.write_videofile(nameout,
@@ -205,19 +205,21 @@ def create_video_Topic(client,topic_path,topic_name):
         ai_vid = img2vid(f"./intermediate/image_gen/{idx}.png", dct["duration"], texts["narrator"])
         ai_vids.append(ai_vid)
 
-    for dct in output_lists[0]:
+    lenny_indices = []
+    for idx, dct in enumerate(output_lists[0]):
         if dct["index"] != -1:
             vid = re_vids[c_re]
             c_re+=1
         else:
             vid = ai_vids[c_ai]
             c_ai+=1
+            lenny_indices.append(idx)
         vids.append(vid)
 
 
     # ##pual's:
 
-    concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4")
+    concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4", lenny_indices)
 
     create_shorts_from_collections(topic_path,
                             topic_path+topic_name)
