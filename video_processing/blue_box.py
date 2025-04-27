@@ -199,8 +199,8 @@ def create_video_Topic(client,topic_path,topic_name):
 
 
     #TODO: HERE ADD PAUL'S FUNCTION
-    #for idx, vids2gen in enumerate(output_lists[1]):
-        # image_generator(client, vids2gen["description"], idx) # Replace with Paul
+    for idx, vids2gen in enumerate(output_lists[1]):
+         image_generator(client, vids2gen["description"], idx) # Replace with Paul
         # image_generator(client, summary, idx) # Replace with Paul
 
     smallest_dims = (float("inf"), float("inf"))
