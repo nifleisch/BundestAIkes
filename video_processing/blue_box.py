@@ -6,6 +6,13 @@ import requests
 from moviepy import *
 import dotenv
 import base64
+import os
+
+
+if not os.path.exists("./intermediate/image_gen"):
+    os.makedirs("./intermediate/image_gen",exist_ok=True)
+if not os.path.exists("./intermediate/tiktok"):
+        os.makedirs("./intermediate/tiktok",exist_ok=True)
 
 def image_generator(client, prompt, idx):
     
@@ -17,8 +24,7 @@ def image_generator(client, prompt, idx):
 
     image_base64 = result.data[0].b64_json
     image_bytes = base64.b64decode(image_base64)
-
-    # Step 4: Save the image
+    
     with open(f"./intermediate/image_gen/{idx}.png", "wb") as f:
         f.write(image_bytes)
 
@@ -116,6 +122,9 @@ def script_generator(client, system_text, clips, summary):
         
         data = json.loads(assistant_reply)
         output_list.append(data)
+        if not os.path.exists("./intermediate/tiktokscript"):
+            os.makedirs("./intermediate/tiktokscript")
+       
         with open(f'./intermediate/tiktokscript/output_{idx}.json', 'w') as json_file:
             json.dump(data, json_file, indent=4)
         print(f"Succesful reply {idx}")
@@ -181,14 +190,21 @@ def vid2croppedclip(clips, path, smallest_dims) -> list[VideoFileClip]:
             clips_out.append(clip_final_sub)
     return clips_out, smallest_dims 
 
-def concatenate_videos(clip_list, nameout, smallest_dims):
+from  moviepy.video.fx import FadeOut
+
+def concatenate_videos(clip_list, nameout, lenny_indices ,smallest_dims):
+
+    effect= FadeOut(2)
     for idx, clip in enumerate(clip_list):
         clip_list[idx] = clip.resized(smallest_dims)
+    for index in lenny_indices:
+        clip_list[index] = effect.copy().apply(clip_list[index]) 
     clipfinal = concatenate_videoclips(clip_list)
     if ".mp4" in nameout:
         clipfinal.write_videofile(nameout,
                                    codec="libx264",
-                                     fps=50)
+                                     fps=50,
+                                     audio_codec="aac")
     else:
         print("Error, missing extension.")
     for c in clip_list:
@@ -239,8 +255,8 @@ def create_video_Topic(client,topic_path,topic_name):
 
 
     #TODO: HERE ADD PAUL'S FUNCTION
-    # for idx, vids2gen in enumerate(output_lists[1]):
-    #     image_generator(client, vids2gen["description"], idx) # Replace with Paul
+    #for idx, vids2gen in enumerate(output_lists[1]):
+        # image_generator(client, vids2gen["description"], idx) # Replace with Paul
         # image_generator(client, summary, idx) # Replace with Paul
 
     smallest_dims = (float("inf"), float("inf"))
@@ -264,22 +280,33 @@ def create_video_Topic(client,topic_path,topic_name):
         ai_vid, smallest_dims = img2vid(f"./intermediate/image_gen/{idx}.png", dct["duration"], texts["narrator"],smallest_dims)
         ai_vids.append(ai_vid)
 
-
-
-
-
-    for dct in output_lists[0]:
+    lenny_indices = []
+    for idx, dct in enumerate(output_lists[0]):
         if dct["index"] != -1:
             vid = re_vids[c_re]
             c_re+=1
         else:
             vid = ai_vids[c_ai]
             c_ai+=1
+            lenny_indices.append(idx)
         vids.append(vid)
 
-    concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4",smallest_dims)
+    # ##pual's:
 
-    # captioned_video_path = create_captions("./intermediate/tiktok/tiktok_inter.mp4", "./intermediate/tiktok/")
+    concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4", lenny_indices,smallest_dims)
+
+    # # create_shorts_from_collections(input_path, transcript_path)
+    
+    # extracted_frame= extracted_frame(topic_path, topic_path+topic_name)
+    # # extracted_frame = extract_frame(args.video_path, args.json_path)
+    
+    # # captioned_video_path = create_captions(topic_path, "./intermediate/captioned")
+
+    # # captioned_video_path = create_captions(input_video, output_directory)
+
+
+    # re_vids = vid2croppedclip(output_lists[0], clips, "./data/input/video.mp4")
+
 
 
 
@@ -297,5 +324,5 @@ if __name__ == "__main__":
     dotenv.load_dotenv()
 
     client = OpenAI()
-
-    create_video_Topic(client,"./intermediate/shorts_draft/","generationengerechtigkeit")
+    
+    create_video_Topic(client,"./intermediate/shorts_draft/","antisemitismus")
