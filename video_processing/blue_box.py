@@ -5,56 +5,26 @@ import json
 import requests
 from moviepy import *
 import dotenv
-def crop_video(clip):  
-    target_width = 600
-    target_height = 945
-    if clip.w < target_width and clip.h<target_height:
-        target_width = 406
-        target_height = 640
 
+def crop_video(clip, smallest_dims):
+    height = clip.h
+    width = clip.w
+
+    new_width = int(height * 600 / 945)
+    
     center_x = clip.w / 2
 
     center_y = clip.h / 2
-    crop_width = min(target_width, clip.w)   
-    # crop_width = (target_width)   
-
-    crop_height = min(target_height, clip.h)
-    # crop_height = (target_height)
 
     cc=clip.cropped(x_center=center_x,
                     y_center=center_y,
-                    width=crop_width,
-                    height=crop_height
+                    width=new_width,
+                    height=height
                     )
-    clip = cc.resized((target_width, target_height))
-    return clip
-
-# def crop_video(clip, smallest_dims):
-#     height = clip.h
-#     width = clip.w
-
-#     new_width = int(height * 600 / 945)
-    
-#     target_width = 600
-#     target_height = 945
-#     center_x = clip.w / 2
-
-#     center_y = clip.h / 2
-#     crop_width = min(target_width, clip.w)   
-#     crop_width = (target_width)   
-
-#     crop_height = min(target_height, clip.h)
-#     crop_height = (target_height)
-
-#     cc=clip.cropped(x_center=center_x,
-#                     y_center=center_y,
-#                     width=new_width,
-#                     height=height
-#                     )
-#     #clip = cc.resized((target_width, target_height))
-#     if smallest_dims[0] > new_width:
-#         smallest_dims = (new_width, height)
-#     return cc, smallest_dims
+    #clip = cc.resized((target_width, target_height))
+    if smallest_dims[0] > new_width:
+        smallest_dims = (new_width, height)
+    return cc, smallest_dims
 
 def script_generator(client, system_text, clips, summary):
     output_list = []
@@ -117,7 +87,7 @@ def image_generator(client, prompt, idx):
     #print("Image successfully saved as 'generated_image.png'!")
 
 #NOTE: NOT NEEDED SINCE WE GET CLIPS, WE JUST HAVE TO CROP NILS CLIPS
-def vid2croppedclip(clips, path) -> list[VideoFileClip]:
+def vid2croppedclip(clips, path, smallest_dims) -> list[VideoFileClip]:
     clips_out = []
     for c in clips:
         if c["index"]!=-1:
@@ -131,12 +101,14 @@ def vid2croppedclip(clips, path) -> list[VideoFileClip]:
                 clip = VideoFileClip(filepath)            
             # start = clips_times[c["index"]]["start"]
             # end = clips_times[c["index"]]["end"]            
-            clip_final_sub = crop_video(clip)
+            clip_final_sub, smallest_dims = crop_video(clip, smallest_dims)
             # clip_final_sub = clip_final_sub.subclipped(start, end) 
             clips_out.append(clip_final_sub)
-    return clips_out
+    return clips_out, smallest_dims 
 
-def concatenate_videos(clip_list, nameout):
+def concatenate_videos(clip_list, nameout, smallest_dims):
+    for idx, clip in enumerate(clip_list):
+        clip_list[idx] = clip.resized(smallest_dims)
     clipfinal = concatenate_videoclips(clip_list)
     if ".mp4" in nameout:
         clipfinal.write_videofile(nameout,
@@ -148,15 +120,15 @@ def concatenate_videos(clip_list, nameout):
         c.close()
     clipfinal.close()
 
-def img2vid(image_path, duration, text):
+def img2vid(image_path, duration, text, smallest_dims):
     text_to_speech(text)
     audio = AudioFileClip("tmp.mp3")
     clip = ImageClip(image_path)
     zoom_clip = clip.with_duration(duration)
-    zoom_clip = crop_video(zoom_clip)
+    zoom_clip, smallest_dims = crop_video(zoom_clip, smallest_dims)
     audio = audio.subclipped(0, zoom_clip.duration)
     zoom_clip = zoom_clip.with_audio(audio)
-    return zoom_clip
+    return zoom_clip, smallest_dims
 
 def text_to_speech(text, voice="nova", model="tts-1"):
     response = openai.audio.speech.create(
@@ -187,7 +159,9 @@ def create_video_Topic(client,topic_path,topic_name):
         image_generator(client, vids2gen["description"], idx) # Replace with Paul
         # image_generator(client, summary, idx) # Replace with Paul
 
-    re_vids = vid2croppedclip(output_lists[0], topic_path+topic_name)
+    smallest_dims = (float("inf"), float("inf"))
+
+    re_vids, smallest_dims = vid2croppedclip(output_lists[0], topic_path+topic_name, smallest_dims)
 
     # get_aiids(output_lists)
     ai_vids = []
@@ -202,7 +176,7 @@ def create_video_Topic(client,topic_path,topic_name):
                     break
                 counter+=1
         print(texts["narrator"])
-        ai_vid = img2vid(f"./intermediate/image_gen/{idx}.png", dct["duration"], texts["narrator"])
+        ai_vid, smallest_dims = img2vid(f"./intermediate/image_gen/{idx}.png", dct["duration"], texts["narrator"])
         ai_vids.append(ai_vid)
 
     for dct in output_lists[0]:
@@ -217,7 +191,7 @@ def create_video_Topic(client,topic_path,topic_name):
 
     # ##pual's:
 
-    concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4")
+    concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4", smallest_dims)
 
     create_shorts_from_collections(topic_path,
                             topic_path+topic_name)
