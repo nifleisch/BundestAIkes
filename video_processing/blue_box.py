@@ -7,6 +7,7 @@ from moviepy import *
 import dotenv
 import base64
 import os
+from create_captions import create_captions
 
 
 if not os.path.exists("./intermediate/image_gen"):
@@ -295,7 +296,9 @@ def create_video_Topic(client,topic_path,topic_name):
     # ##pual's:
 
     concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4", lenny_indices,smallest_dims)
-
+    captioned_video_path = create_captions("./intermediate/tiktok/tiktok_inter.mp4", "./output/tiktok/")
+    print("--- Caption Generation Successful ---")
+    print(f"Output video saved to: {captioned_video_path}")
     # # create_shorts_from_collections(input_path, transcript_path)
     
     # extracted_frame= extracted_frame(topic_path, topic_path+topic_name)

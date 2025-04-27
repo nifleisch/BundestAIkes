@@ -8,7 +8,6 @@ import argparse
 
 # Ensure ffmpeg is installed and accessible in the system PATH.
 # You might need to install it separately (e.g., `brew install ffmpeg` on macOS, `sudo apt update && sudo apt install ffmpeg` on Debian/Ubuntu).
-
 def create_captions(video_path: str, output_directory: str = None) -> str:
     """
     Generates captions for a video, highlighting the currently spoken word,
@@ -55,8 +54,8 @@ def create_captions(video_path: str, output_directory: str = None) -> str:
         # 3. Create TextClips for each word
         print("Generating caption clips (single word highlight)...")
         highlight_color = 'yellow'
-        fontsize = max(24, int(video.h * 0.04)) # Dynamic fontsize
-        font = 'Arial-Bold' 
+        fontsize = int(max(24, int(video.h * 0.04))) # Dynamic fontsize
+        font = 'Arial' 
         stroke_color = 'black'
         stroke_width = max(1, int(fontsize * 0.05))
         
@@ -97,26 +96,30 @@ def create_captions(video_path: str, output_directory: str = None) -> str:
             # Using method='caption' which is generally more reliable than pango
             try:
                  txt_clip = TextClip(
-                     txt=word_text,
-                     fontsize=fontsize,
+                    #  text=word_text,
+                    #  fontsize=fontsize,
+                     text=word_text,
+                     font_size=fontsize,
                      color=highlight_color, 
                      font=font,
                      stroke_color=stroke_color,
                      stroke_width=stroke_width,
                      method='caption',
-                     align='center'
+                     size=(600, None)
+                    #  method='pillow',
+                    #  align='center'
                  )
             except Exception as clip_err:
-                 print(f"\\n*** ERROR creating TextClip for word '{word_text}': {clip_err} ***")
+                 print(f"\\n** ERROR creating TextClip for word '{word_text}': {clip_err} **")
                  # Decide if you want to skip the word or raise the error
                  # raise clip_err 
                  continue # Skip this word if clip creation fails
 
             # Set timing and position
             txt_clip = (txt_clip
-                        .set_start(start_time)
-                        .set_duration(duration)
-                        .set_position(text_position))
+                        .with_start(start_time)
+                        .with_duration(duration)
+                        .with_position(text_position))
 
             caption_clips.append(txt_clip)
             total_words_processed += 1
@@ -141,6 +144,7 @@ def create_captions(video_path: str, output_directory: str = None) -> str:
                 os.makedirs(output_directory)
             output_path = os.path.join(output_directory, output_filename)
         else:
+             print(output_directory)
              output_path = os.path.join(os.path.dirname(video_path), output_filename)
 
 
@@ -186,7 +190,6 @@ def create_captions(video_path: str, output_directory: str = None) -> str:
             except OSError as ose:
                 print(f"Warning: Could not remove temporary audio file {audio_path}: {ose}")
         print("Cleanup finished.")
-
 
 # Example usage (optional, for testing - uncomment and provide a real path)
 if __name__ == "__main__":
