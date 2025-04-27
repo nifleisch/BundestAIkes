@@ -12,7 +12,7 @@
 
 ## ✨ Inspiration
 
-The Bundestag is the heart of German democracy, yet many citizens don’t what’s being debated there. Although [full plenary sessions are publicly available](https://www.bundestag.de/parlamentsfernsehen), they last three to six hours - too long for today’s attention spans. Our project turns these long videos into 30–60 second shorts that capture the key discussion points of the debates. We focus on the respectful discussions that make our democracy work, not on polarizing viewpoints.
+The Bundestag is the heart of German democracy, yet most citizens don’t know what goes on there. Although [full plenary sessions are publicly available](https://www.bundestag.de/parlamentsfernsehen), they last three to six hours - too long for today’s attention spans. Our project turns these long videos into 30–60 second shorts that capture the key discussion points of the debates. We focus on the respectful discussions that make our democracy work, not on polarizing viewpoints.
 
 
 ## 📋 Project Overview
@@ -24,6 +24,51 @@ This project is a fully automated pipeline that turns a 3–6 hour video into se
 ## 👀 Have a Look
 
 To put this pipeline into good use, we’ve produced an initial batch of shorts from recent plenary sessions and uploaded them to YouTube. This is just the beginning, we have plenty of ideas to take this prototype even further. Subscribe to our [Youtube Channel](https://www.youtube.com/@bundestAIkes) to join us on this journey. Below, you’ll find a selection of the videos we’ve created.
+
+<div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+  <!-- Video 1 -->
+  <div style="
+      flex: 1 1 calc(33.333% - 1rem);
+      min-width: 200px;
+      aspect-ratio: 9 / 16;
+      position: relative;
+    ">
+    <video
+      controls
+      preload="metadata"
+      style="
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+      "
+    >
+      <source src="assets/example_video_1.mp4" type="video/mp4">
+      Your browser doesn’t support the video tag.
+    </video>
+  </div>
+
+  <!-- Video 2 -->
+  <div style="
+      flex: 1 1 calc(33.333% - 1rem);
+      min-width: 200px;
+      aspect-ratio: 9 / 16;
+      position: relative;
+    ">
+    <video
+      controls
+      preload="metadata"
+      style="
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+      "
+    >
+      <source src="assets/example_video_2.mp4" type="video/mp4">
+      Your browser doesn’t support the video tag.
+    </video>
+  </div>
 
 
 ## 🚧 Challenges
