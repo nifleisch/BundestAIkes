@@ -207,10 +207,11 @@ def concatenate_videos(clip_list, nameout, smallest_dims):
 def img2vid(image_path, duration, text, smallest_dims):
     text_to_speech(text)
     audio = AudioFileClip("tmp.mp3")
+    # Get the duration in seconds
+    duration = audio.duration
     clip = ImageClip(image_path)
     zoom_clip = clip.with_duration(duration)
     zoom_clip, smallest_dims = crop_video(zoom_clip, smallest_dims)
-    audio = audio.subclipped(0, zoom_clip.duration)
     zoom_clip = zoom_clip.with_audio(audio)
     return zoom_clip, smallest_dims
 
