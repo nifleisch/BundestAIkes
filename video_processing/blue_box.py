@@ -37,18 +37,11 @@ def crop_video(clip):
 
     crop_width = min(target_width, clip.w)   
     crop_height = min(target_height, clip.h)
-    print('-'*8)
-    print(target_width, clip.w,crop_width)
-    print(target_height, clip.h,crop_height)
-    print('-'*8)
 
 
     center_x = clip.w / 2
 
     center_y = clip.h / 2
-    # crop_width = (target_width)   
-
-    # crop_height = (target_height)
 
     cc=clip.cropped(x_center=center_x,
                     y_center=center_y,
@@ -56,7 +49,6 @@ def crop_video(clip):
                     height=crop_height
                     )
     if clip.w < target_width or clip.h<target_height:
-        print("SHORTER!!!!")
         target_width = 600
         target_height = 360
         crop_width = target_width# min(target_width, clip.w)   
@@ -110,10 +102,8 @@ def script_generator(client, system_text, clips, summary):
         
         # Get assistant response
         response = client.chat.completions.create(
-            model="gpt-4.1",
+            model="o4-mini",
             messages=messages,
-            temperature=0.5,
-            max_tokens=1000
         )
         
         # Save assistant reply
@@ -128,50 +118,8 @@ def script_generator(client, system_text, clips, summary):
        
         with open(f'./intermediate/tiktokscript/output_{idx}.json', 'w') as json_file:
             json.dump(data, json_file, indent=4)
-        print(f"Succesful reply {idx}")
     return output_list
 
-#TODO: REPLACE WITH PAUL
-# def image_generator(client, prompt, idx):
-#     response = client.images.generate(
-#         model="dall-e-3",
-#         # model="gpt-image-1",
-#         prompt=prompt,
-#         n=1,
-#         size="1024x1024"
-#     )
-
-#     # Step 2: Get the URL
-#     image_url = response.data[0].url
-
-#     # Step 3: Download the image
-#     image_data = requests.get(image_url).content
-
-#     # Step 4: Save the image
-#     with open(f"./intermediate/image_gen/{idx}.png", "wb") as f:
-#         f.write(image_data)
-
-#     #print("Image successfully saved as 'generated_image.png'!")
-
-#NOTE: NOT NEEDED SINCE WE GET CLIPS, WE JUST HAVE TO CROP NILS CLIPS
-# def vid2croppedclip(clips, path) -> list[VideoFileClip]:
-#     clips_out = []
-#     for c in clips:
-#         if c["index"]!=-1:
-#             try:
-#                 filename = f"statement_{c['index']}_final.mp4"
-#                 filepath = path +'/'+filename
-#                 clip = VideoFileClip(filepath)
-#             except:
-#                 filename = f"statement_{c['index']}_rough.mp4"
-#                 filepath = path +'/'+filename
-#                 clip = VideoFileClip(filepath)            
-#             # start = clips_times[c["index"]]["start"]
-#             # end = clips_times[c["index"]]["end"]            
-#             clip_final_sub = crop_video(clip)
-#             # clip_final_sub = clip_final_sub.subclipped(start, end) 
-#             clips_out.append(clip_final_sub)
-#     return clips_out
 def vid2croppedclip(clips, path, smallest_dims) -> list[VideoFileClip]:
     clips_out = []
     for c in clips:
@@ -212,16 +160,9 @@ def concatenate_videos(clip_list, nameout, lenny_indices ,smallest_dims):
         c.close()
     clipfinal.close()
 
-# def img2vid(image_path, duration, text,smallest):
-#     text_to_speech(text)
-#     audio = AudioFileClip("tmp.mp3")
-#     clip = ImageClip(image_path)
-#     zoom_clip = clip.with_duration(duration)
-#     zoom_clip = crop_video(zoom_clip)
-#     audio = audio.subclipped(0, zoom_clip.duration,smallest)
-#     zoom_clip = zoom_clip.with_audio(audio)
-#     return zoom_clip
 def img2vid(image_path, duration, text, smallest_dims):
+    if os.path.exists("tmp.mp3"):
+        os.remove("tmp.mp3")
     text_to_speech(text)
     audio = AudioFileClip("tmp.mp3")
     # Get the duration in seconds
@@ -277,7 +218,6 @@ def create_video_Topic(client,topic_path,topic_name):
                 if idx == counter:
                     break
                 counter+=1
-        print(texts["narrator"])
         # ai_vid = img2vid(f"./intermediate/image_gen/{idx}.png", dct["duration"], texts["narrator"])
         ai_vid, smallest_dims = img2vid(f"./intermediate/image_gen/{idx}.png", dct["duration"], texts["narrator"],smallest_dims)
         ai_vids.append(ai_vid)
@@ -295,25 +235,10 @@ def create_video_Topic(client,topic_path,topic_name):
 
     # ##pual's:
 
-    concatenate_videos(vids,"./intermediate/tiktok/tiktok_inter.mp4", lenny_indices,smallest_dims)
-    captioned_video_path = create_captions("./intermediate/tiktok/tiktok_inter.mp4", "./output/tiktok/")
+    concatenate_videos(vids,f"./intermediate/tiktok/{topic_name}.mp4", lenny_indices,smallest_dims)
+    captioned_video_path = create_captions(f"./intermediate/tiktok/{topic_name}.mp4", "./output/tiktok/")
     print("--- Caption Generation Successful ---")
     print(f"Output video saved to: {captioned_video_path}")
-    # # create_shorts_from_collections(input_path, transcript_path)
-    
-    # extracted_frame= extracted_frame(topic_path, topic_path+topic_name)
-    # # extracted_frame = extract_frame(args.video_path, args.json_path)
-    
-    # # captioned_video_path = create_captions(topic_path, "./intermediate/captioned")
-
-    # # captioned_video_path = create_captions(input_video, output_directory)
-
-
-    # re_vids = vid2croppedclip(output_lists[0], clips, "./data/input/video.mp4")
-
-
-
-
 
 def create_all_videos(client,path: str, topics):
     print("Generating videos... ")
@@ -323,10 +248,14 @@ def create_all_videos(client,path: str, topics):
     print("Thanks, now enjoy...")
 
 
-
 if __name__ == "__main__":
     dotenv.load_dotenv()
 
     client = OpenAI()
-    
-    create_video_Topic(client,"./intermediate/shorts_draft/","antisemitismus")
+
+    topics_dir = "./intermediate/shorts_draft/"
+
+    for topic_name in os.listdir(topics_dir):
+        if topic_name == '.DS_Store':
+            continue
+        create_video_Topic(client, topics_dir, topic_name)
