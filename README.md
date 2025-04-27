@@ -23,17 +23,7 @@ This project is a fully automated pipeline that turns a 3–6 hour video into se
 
 ## 👀 Have a Look
 
-To put this pipeline into good use, we’ve produced an initial batch of shorts from recent plenary sessions and uploaded them to YouTube. This is just the beginning, we have plenty of ideas to take this prototype even further. Subscribe to our [Youtube Channel](https://www.youtube.com/@bundestAIkes) to join us on this journey. Below, you’ll find a selection of the videos we’ve created.
-
-<video  controls >
-<source src="assets/example_video_1.mp4" type="video/mp4">
-</video>
-<video  controls >
-<source src="assets/example_video_2.mp4" type="video/mp4">
-</video>
-<video  controls >
-<source src="assets/example_video_3.mp4" type="video/mp4">
-</video>
+To put this pipeline into good use, we’ve produced an initial batch of shorts from recent plenary sessions and uploaded them to YouTube (see [example 1](https://youtube.com/shorts/2D8VtGN3HUI), [example 2](https://youtube.com/shorts/q2fnzWVmRdo) for example). This is just the beginning, we have plenty of ideas to take this prototype even further. Subscribe to our [Youtube Channel](https://www.youtube.com/@bundestAIkes) to join us on this journey.
 
 ## 🚧 Challenges
 
@@ -71,6 +61,7 @@ Since the pipeline will make several API calls, you must provide keys for both A
 
 ```bash
 python prepare_shorts.py <path to .mp4 file>
+python short_generation
 ```
 
 Depending on the session, the pipeline takes between 10–30 minutes. When it’s finished, you’ll find the shorts in the `output` folder.
