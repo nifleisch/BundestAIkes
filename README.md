@@ -25,50 +25,18 @@ This project is a fully automated pipeline that turns a 3–6 hour video into se
 
 To put this pipeline into good use, we’ve produced an initial batch of shorts from recent plenary sessions and uploaded them to YouTube. This is just the beginning, we have plenty of ideas to take this prototype even further. Subscribe to our [Youtube Channel](https://www.youtube.com/@bundestAIkes) to join us on this journey. Below, you’ll find a selection of the videos we’ve created.
 
-<div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-  <!-- Video 1 -->
-  <div style="
-      flex: 1 1 calc(33.333% - 1rem);
-      min-width: 200px;
-      aspect-ratio: 9 / 16;
-      position: relative;
-    ">
-    <video
-      controls
-      preload="metadata"
-      style="
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        object-fit: cover;
-      "
-    >
-      <source src="assets/example_video_1.mp4" type="video/mp4">
+<div class="video-row">
+  <div class="video-cell">
+    <video controls preload="metadata" src="{{ 'assets/example_video_1.mp4' | relative_url }}">
       Your browser doesn’t support the video tag.
     </video>
   </div>
-
-  <!-- Video 2 -->
-  <div style="
-      flex: 1 1 calc(33.333% - 1rem);
-      min-width: 200px;
-      aspect-ratio: 9 / 16;
-      position: relative;
-    ">
-    <video
-      controls
-      preload="metadata"
-      style="
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        object-fit: cover;
-      "
-    >
-      <source src="assets/example_video_2.mp4" type="video/mp4">
+  <div class="video-cell">
+    <video controls preload="metadata" src="{{ 'assets/example_video_2.mp4' | relative_url }}">
       Your browser doesn’t support the video tag.
     </video>
   </div>
+</div>
 
 
 ## 🚧 Challenges
