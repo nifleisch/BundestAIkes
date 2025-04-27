@@ -1,5 +1,5 @@
 moviepy>=1.0.3
-openai-whisper>=20231117
+#openai-whisper>=20231117
 numpy>=1.25.0
 requests
 pillow
@@ -12,3 +12,4 @@ openai
 mutagen>=1.47.0
 assemblyai>=0.40.2
 dotenv>=0.9.9
+fuzzywuzzy

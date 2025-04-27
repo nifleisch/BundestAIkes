@@ -12,7 +12,7 @@
 
 ## ✨ Inspiration
 
-The Bundestag is the heart of German democracy, yet most citizens don’t know what goes on there. Although [full plenary sessions are publicly available](https://www.bundestag.de/parlamentsfernsehen), they last three to six hours - too long for today’s attention spans. Our project turns these long videos into 30–60 second shorts that capture the key discussion points of the debates. We focus on the respectful discussions that make our democracy work, not on polarizing viewpoints.
+The Bundestag is the heart of German democracy, yet many citizens don’t what’s being debated there. Although [full plenary sessions are publicly available](https://www.bundestag.de/parlamentsfernsehen), they last three to six hours - too long for today’s attention spans. Our project turns these long videos into 30–60 second shorts that capture the key discussion points of the debates. We focus on the respectful discussions that make our democracy work, not on polarizing viewpoints.
 
 
 ## 📋 Project Overview
