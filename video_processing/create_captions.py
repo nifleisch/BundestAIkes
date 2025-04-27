@@ -1,4 +1,5 @@
-import moviepy.editor as mp
+# import moviepy.editor as mp
+from moviepy import *
 import whisper
 import os
 import tempfile
@@ -29,7 +30,7 @@ def create_captions(video_path: str, output_directory: str = None) -> str:
         raise FileNotFoundError(f"Video file not found: {video_path}")
 
     print(f"Loading video: {video_path}")
-    video = mp.VideoFileClip(video_path)
+    video = VideoFileClip(video_path)
     audio_path = None
     final_clip = None
     caption_clips = []
@@ -95,7 +96,7 @@ def create_captions(video_path: str, output_directory: str = None) -> str:
             # Create the text clip for the highlighted word
             # Using method='caption' which is generally more reliable than pango
             try:
-                 txt_clip = mp.TextClip(
+                 txt_clip = TextClip(
                      txt=word_text,
                      fontsize=fontsize,
                      color=highlight_color, 
@@ -129,7 +130,7 @@ def create_captions(video_path: str, output_directory: str = None) -> str:
 
         # 4. Composite captions onto the original video
         print("Compositing video and captions...")
-        final_clip = mp.CompositeVideoClip([video, *caption_clips])
+        final_clip = CompositeVideoClip([video, *caption_clips])
 
         # 5. Define output path
         base, ext = os.path.splitext(os.path.basename(video_path))
